@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8">
+    <title>Select</title>
+    <style>
+      ul {
+        padding-top: 0;
+        margin-top: 0;
+      }
+      li,
+      ul {
+        list-style: none;
+        padding-left: 0;
+      }
+      li:hover {
+        background-color: #ddd;
+        cursor: pointer;
+      }
+      form {
+        width: 250px;
+      }
+      form ul {
+        width: 200px;
+        border: 1px solid #ddd;
+      }
+      form li {
+        padding: 10px;
+        width: 200px;
+        box-sizing: border-box;
+      }
+      .select-container {
+        display: none;
+      }
+      .visible-option {
+        border: 1px solid #ddd;
+        padding: 10px;
+        width: 200px;
+        display: block;
+        box-sizing: border-box;
+      }
+
+    </style>
+  </head>
+  <body>
+    <h1>Select</h1>
+    <br>
+
+    <form method="GET">
+      <select name="Zwierzaki">
+        <option value="Pies" selected="selected">Pies</options>
+        <option value="Kot">Kot</options>
+        <option value="Kanarek">Kanarek</options>
+      </select><input type="submit" value="Wyślij"/>
+      <br><br>
+
+    </form>
+
+    <br>
+
+    <form method="GET">
+      <select name="Ubrania">
+        <option value="Czapka">Czapka</options>
+        <option value="Spodnie">Spodnie</options>
+        <option value="Sukienka">Sukienka</options>
+        <option value="Szalik">Szalik</options>
+      </select>
+      <input type="submit" value="Wyślij"/>
+    </form>
+    <br>
+    <br>
+
+    <br>
+
+    <script>
+      var parentForm = document.getElementsByTagName("form")[0];
+      var originSelect = parentForm.getElementsByTagName("select")[0];
+
+      var selectForms = document.getElementsByTagName("form").length
+
+      for (var x = 0; x < selectForms; x++) {
+        changeSelect(x)
+      }
+      var parentForm1 = document.getElementsByTagName("form")[0]
+
+      /* Funkcja przetwarzająca wszystkie znaczniki "Select" na stronie */
+      function changeSelect(number) {
+
+        /* Pobrane elementy */
+
+        var parentForm = document.getElementsByTagName("form")[number];
+        var originSelect = parentForm.getElementsByTagName("select")[0];
+        var originOptions = originSelect.getElementsByTagName("option");
+        var submit = parentForm.getElementsByTagName("input")[0]
+
+        originSelect.style.display = "none"
+
+        /* Pobieranie wartości z option */
+        var originOptionsValue = []
+        for (var i = 0; i < originOptions.length; i++) {
+          var opcja = originOptions[i].firstChild.nodeValue
+          originOptionsValue.push(opcja.trim())
+        }
+
+        /* Utworzenie listy ul */
+        var select = document.createElement("ul");
+        select.setAttribute("class", "select-container")
+
+        /* Utworzenie elementów listy li */
+        var z = 0;
+        while (z < originOptions.length) {
+          var option = document.createElement("li");
+          var optionText = document.createTextNode(originOptionsValue[z]);
+          option.appendChild(optionText)
+          select.appendChild(option)
+          z++
+        }
+        /* Utworzenie widocznej opcji */
+        var visibleOption = document.createElement("span");
+        visibleOption.setAttribute("class", "visible-option")
+        var featuredOptioext = document.createTextNode(originOptions[originSelect.selectedIndex].firstChild.nodeValue.trim());
+        visibleOption.appendChild(featuredOptioext)
+        parentForm.insertBefore(visibleOption, newSelect)
+        parentForm.appendChild(select)
+        parentForm.appendChild(submit)
+
+        /* Pobranie widocznej opcji z DOM */
+        var selectedOption = parentForm.getElementsByClassName("visible-option")[0];
+        selectedOption.setAttribute("tabindex", "0")
+        var newSelect = parentForm.getElementsByClassName("select-container")[0];
+        newSelect.setAttribute("role", "listbox")
+        var newOptions = newSelect.getElementsByTagName("li");
+        for (var w = 0; w < newOptions.length; w++) {
+          newOptions[w].setAttribute("role", "option")
+        }
+
+        function dropDown() {
+          var valueDisplay = window.getComputedStyle(newSelect, null).getPropertyValue("display")
+          if (valueDisplay === "none") {
+            newSelect.style.display = "block";
+          } else if (valueDisplay === "block") {
+            newSelect.style.display = "none";
+          }
+        }
+
+        /* Rozwijane menu */
+        selectedOption.addEventListener("click", function () {
+          dropDown()
+        }, false)
+
+        function addSelected(e) {
+          var clickedElement = e.target;
+
+          /* usunięcie atrybutow select ze wszystkich elementow */
+          for (var z = 0; z < newOptions.length; z++) {
+            newOptions[z].removeAttribute("class", "selected");
+            originOptions[z].removeAttribute("selected", "selected");
+          }
+
+          /* Zablokowanie dodawania atrybutu class="selected" do elementu ul */
+          if (clickedElement.classList[0] !== "select-container") {
+            clickedElement.setAttribute("class", "selected")
+            var selectedText = clickedElement.firstChild.nodeValue;
+            selectedOption.textContent = selectedText
+          }
+
+          /* Dodanie atrybutu select="selected" do oryginalnego select */
+          for (var v = 0; v < newOptions.length; v++) {
+            var clickedElementString = clickedElement.firstChild.nodeValue
+            if (clickedElementString === newOptions[v].firstChild.nodeValue) {
+              originOptions[v].setAttribute("selected", "selected")
+            }
+          }
+
+          newSelect.style.display = "none";
+
+        }
+
+        /* Dodanie select="selected" do zaznaczonych elementow nowej listy */
+        newSelect.addEventListener('click', function (e) {
+          addSelected(e)
+        })
+
+        /* Zmiana elementu nowej listy przy zmianie w oryginanym Selekcie */
+        originSelect.addEventListener("change", function () {
+
+          /* Usunięcie wszystkich atrybutow klas "selected" */
+          for (var i = 0; i < newOptions.length; i++) {
+            newOptions[i].removeAttribute("class", "selected");
+          }
+
+          var originSelectValue = originSelect.options[originSelect.selectedIndex].value;
+          var originNumber = originSelect.selectedIndex;
+          newOptions[originNumber].setAttribute("class", "selected");
+          var selectedText = newOptions[originNumber].firstChild.nodeValue;
+          selectedOption.textContent = selectedText
+
+        }, false)
+
+        // dopasuj select w kopii do oyginału Dodaj przez Enter
+        selectedOption.addEventListener("keydown", function (e) {
+          var keyCode = e.keyCode;
+          if (e.keyCode === 13) {
+            dropDown();
+            for (var z = 0; z < newOptions.length; z++) {
+              newOptions[z].setAttribute("tabindex", "0")
+            }
+            e.target.nextElementSibling.firstElementChild.focus()
+          }
+
+        }, false);
+
+        newSelect.addEventListener("keydown", function (e) {
+          if (e.keyCode === 40 && e.target.nextElementSibling !== null) {
+            e.target.nextElementSibling.focus();
+          }
+          if (e.keyCode === 38 && e.target.previousElementSibling !== null) {
+            e.target.previousElementSibling.focus()
+          }
+          if (e.keyCode === 13) {
+
+            addSelected(e);
+          }
+        }, false);
+      }
+
+      /* Zamykanie otworzonego menu poprzez kliknięcie obok */
+      function close() {
+        var body = document.documentElement
+        var newSelect = document.getElementsByClassName("select-container")
+
+        body.addEventListener("click", function (e) {
+          if (!(e.target.classList[0] === "select-container") && !(e.target.classList[0] === "visible-option")) {
+            for (var z = 0; z < parentForm.length; z++) {
+              newSelect[z].style.display = "none"
+            }
+          }
+        }, false)
+      }
+
+      close()
+
+      /*
+      ## Założenia i wymagania:
+      - na stronie w kodzie HTML jest działający <select> z opowiednimi opcjami, wartościami, klasami itd.
+      - skrypt powinien wziąć ten select i przekształcić/dodać inny kod HTML, który pozwoli na bardziej rozbudowane stylowanie przy pomocy CSS
+      - nowy “select” ma umożliwiać wybieranie opcji przy pomocy myszki i klawiatury oraz dawać wszystkie możliwości, które daje select natywnie
+      - zmiana opcji w nowym “selekcie” powinna powodować zmianę wartości oryginalnego elementu <select>
+      - zmiana opcji w oryginalnym selekcie powinna powodować zmianę wyświetlanej wartości w nowym "selekcie"
+      - musi być możliwość wykorzystania tego samego kodu w kilku miejscach, na różnych selectach
+      - wybranie opcji i wysłanie formularza powinno prawidłowo działać przy wyłączonym JavaScripcie
+
+      */
+    </script>
+  </body>
+
+</html>
+
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8">
+    <style>
+      .tag {
+        border: 1px solid #ddd;
+        display: inline;
+        padding: 10px;
+        margin-right: 5px;
+
+      }
+      .remove {
+        padding-left: 20px;
+        font-weight: bold;
+        font-family: arial;
+        cursor: pointer;
+      }
+      .remove:hover {
+        opacity: 0.5;
+      }
+      #new-tags {
+        margin-top: 20px;
+        display: block;
+      }
+
+    </style>
+  </head>
+  <body>
+    <h1>DODAWANIE TAGÓW</h1>
+    <input type="text" id="tag-field"></input>
+    <button id="button">Dodaj</button>
+    <div id="new-tags"></div>
+
+    <script>
+
+      var tagField = document.getElementById("tag-field");
+      var newTags = document.getElementById("new-tags");
+      var button = document.getElementById("button");
+
+      /*  Dodaj tag przez wciśnięcie Enter */
+      tagField.addEventListener("keydown", function (e) {
+        var keyCode = e.keyCode;
+        if (e.keyCode === 13) {
+          if (tagField.value !== "" && tagField.value !== " ") {
+            while (newTags.firstChild) {
+              newTags.removeChild(newTags.firstChild);
+            }
+            createTagStorage()
+          }
+        } else {}
+      }, false);
+
+      /* Dodaj przez kliknięcie "Dodaj" */
+      button.addEventListener("click", function () {
+        if (tagField.value !== "" && tagField.value !== " ") {
+          while (newTags.firstChild) {
+            newTags.removeChild(newTags.firstChild);
+          }
+          createTagStorage();
+        }
+      }, false);
+
+      /*  Pobież storage lub utwórz tablice tagów */
+      if (localStorage.tagsStorage) {
+        var odeb = localStorage.getItem("tagsStorage");
+        var tagList = odeb.split(",")
+      } else {
+        var tagList = []
+      }
+
+      /* Pobieranie tagów z localStorage*/
+      function createTagStorage() {
+
+        var value = tagField.value
+
+        /*  Ddodanie do tablicy tagów nowch wartosci pobranych z input */
+        var listTags = value.split(",")
+        tagList = tagList.concat(listTags)
+        var text = tagList.join(",")
+
+        /* Dodanie/uaktualnienie tagów w localStorage */
+        localStorage.setItem("tagsStorage", text);
+        var tagsReceived = localStorage.getItem("tagsStorage");
+        var tags = tagsReceived.split(",")
+        createTag(tags)
+      }
+
+      function createTag(tags) {
+
+        /*  Wyczyszczenie pola input po utworzeniu tagów HTML */
+        tagField.value = ""
+
+        /*  tworzenie nowego elementu tag w HTML */
+        for (var z = 0; z < tags.length; z++) {
+          var tag = document.createElement("div");
+          tag.setAttribute("class", "tag");
+          var textTag = document.createElement("span");
+          textTag.setAttribute("class", "tag-name")
+          var textTagNode = document.createTextNode(tags[z]);
+          textTag.appendChild(textTagNode);
+          tag.appendChild(textTag);
+          newTags.appendChild(tag);
+          removeTag(tag)
+        }
+      }
+
+      /*  Po odświeżeiu strony pobiera dane ze localStorage */
+      if (localStorage.tagsStorage) {
+        var receivedListOfTags = localStorage.getItem("tagsStorage");
+        var listOfTags = receivedListOfTags.split(",")
+        createTag(listOfTags)
+      }
+
+      /* Usuwanie tagu */
+      function removeTag(tag) {
+        var removeTag = document.createElement("span");
+        removeTag.setAttribute("class", "remove")
+        removeTag.innerHTML = "x"
+        tag.appendChild(removeTag);
+
+        /* Usuń HTML tag po kliknięciu */
+        removeTag.addEventListener("click", function () {
+          newTags.removeChild(tag);
+
+          /* Zaktualizuj storage po usunięciu elementu */
+          var x = tag.getElementsByClassName("tag-name")[0].firstChild.nodeValue
+          var odebraneTag = localStorage.getItem("tagsStorage");
+          var tagList = odebraneTag.split(",");
+          var tagIndex = tagList.indexOf(x);
+          tagList.splice(tagIndex, 1);
+          localStorage.setItem("tagsStorage", tagList);
+        }, false);
+      }
+      /*
+      # Zadanie
+      Stwórz aplikację w JavaScript i HTML. Aplikacja ma wyświetlać pole do dodawania tagów w formularzu.
+
+      ## Założenia i wymagania:
+      - aplikacja wyświetla pole tekstowe
+      - użytkownik może wpisywać tam dowolne słowa (tagi)
+      - po wciśnięciu [enter] lub zatwierdzeniu przyciskiem, wpisany tekst jest widoczny obok pola tekstowego w postaci „tagu”, a pole staje się puste
+      - wpisywanie tagów można powtarzać wielokrotnie
+      - jeśli użytkownik wpisze kilka słów oddzielonych przecinkiem to powinny one zostać potraktowane jak kilka tagów
+      - każdy tag powinien mieć możliwość usunięcia – na przykład małym krzyżykiem obok niego
+      - nie wpisanie niczego, lub wpisane wyłącznie białych znaków nie powinno umożliwiać dodania tagu
+      - Dodatkowo: wpisane tagi mogą być zapisane w przeglądarce, tak aby przy kolejnym otwarciu strony były widoczne
+      - zadanie przewiduje korzystanie wyłącznie z czystego JavaScriptu, bez dodatkowych bibliotek typu jQuery czy Bootstrap
+      - oceniane będą: Prawidłowe działanie, obsługa błędów, czytelność kodu
+
+
+      */
+    </script>
+  </body>
+</html>

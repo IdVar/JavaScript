@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8">
+    <title>Wyszukiwarka gifów</title>
+  </head>
+  <body>
+    <h2>Wyszukiwarka gifów</h2>
+    <input type="search" placeholder="Wyszukaj"/>
+    <div id="search-results"></div>
+    <br>
+    <p id="no-results"></p>
+
+    <script>
+      var searchResults = document.getElementById("search-results");
+      var noResults = document.getElementById("no-results")
+      var searchForm = document.getElementsByTagName("input")[0]
+
+      searchForm.addEventListener("input", urlSearch, false)
+
+      var timer;
+      function urlSearch() {
+
+        /* Usunięcie wyników wyszukiwania */
+        if (searchForm.value === "") {
+          searchResults.innerHTML = ""
+          noResults.innerHTML = ""
+        } else {}
+
+        clearTimeout(timer);
+
+        timer = setTimeout(function () {
+          var searchPhrase = searchForm.value;
+          var URL = 'http://api.giphy.com/v1/stickers/search?q=' + searchPhrase + '&api_key=dc6zaTOxFJmzC';
+
+          function loadJSON() {
+            fetch(URL).then(function (results) {
+              return results.json();
+            }).then(function (json) {
+              showPhotos(json);
+            });
+          }
+
+          function showPhotos(data) {
+            for (var z = 0; z < data.data.length; z++) {
+              var href = data.data[z].images.fixed_height.url;
+              var image = document.createElement("img")
+              image.src = href
+              searchResults.appendChild(image)
+            }
+            if (data.data.length === 0 && searchForm.value !== "") {
+              noResults.textContent = "Nic nie znaleziono"
+            }
+          }
+          loadJSON()
+
+        }, 700);
+
+        /* Usunięcie gifów, gdy wprowadzono zmiany w input*/
+        var gifs = searchResults.getElementsByTagName("img").length;
+        if (gifs > 0) {
+          searchResults.innerHTML = ""
+        }
+      }
+      /*
+
+      # Zadanie
+      Stwórz aplikację w JavaScript i HTML. Aplikacja po uruchomieniu ma umożliwić wyszukiwanie zabawnych gifów z Giphy.com.
+
+      ## Założenia i wymagania:
+      - aplikacja wyświetla pole tekstowe
+      - użytkownik może wpisywać tam dowolne słowa
+      - wyszukiwanie powinno następować automatycznie po wpisaniu tekstu, np. 300ms po wpisaniu ostatniej literki
+      - gdy znalezione zostaną jakieś rezultaty, powinny zostać one wyświetlone poniżej
+      - jeśli nie ma żadnych rezultatów, powinien pojawić się stosowny komunikat
+      - oceniane będą: Prawidłowe działanie, obsługa błędów, czytelność kodu
+
+      Dokumentacja API Giphy wraz z przykładami jest dostępna tutaj: https://github.com/Giphy/GiphyAPI
+
+      */
+    </script>
+  </body>
+</html>
+</html>
