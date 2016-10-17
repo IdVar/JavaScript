@@ -123,10 +123,10 @@
           newTags.removeChild(tag);
 
           /* Zaktualizuj storage po usunięciu elementu */
-          var x = tag.getElementsByClassName("tag-name")[0].firstChild.nodeValue
+          var tagValue = tag.getElementsByClassName("tag-name")[0].firstChild.nodeValue
           var odebraneTag = localStorage.getItem("tagsStorage");
           var tagList = odebraneTag.split(",");
-          var tagIndex = tagList.indexOf(x);
+          var tagIndex = tagList.indexOf(tagValue);
           tagList.splice(tagIndex, 1);
           localStorage.setItem("tagsStorage", tagList);
         }, false);
@@ -146,7 +146,6 @@
       - Dodatkowo: wpisane tagi mogą być zapisane w przeglądarce, tak aby przy kolejnym otwarciu strony były widoczne
       - zadanie przewiduje korzystanie wyłącznie z czystego JavaScriptu, bez dodatkowych bibliotek typu jQuery czy Bootstrap
       - oceniane będą: Prawidłowe działanie, obsługa błędów, czytelność kodu
-
 
       */
     </script>
